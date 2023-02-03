@@ -12,11 +12,15 @@ namespace PokemonReviewApp.Controllers
     {
         private readonly IReviewRepository _reviewRepository;
         private readonly IMapper _mapper;
+        private readonly IPokemonRepository _pokeRepository;
+        private readonly IReviewerRepository _reviewerRepository;
 
-        public ReviewController(IReviewRepository reviewRepository, IMapper mapper)
+        public ReviewController(IReviewRepository reviewRepository, IPokemonRepository pokemonRepository, IReviewerRepository reviewerRepository, IMapper mapper)
         {
             _reviewRepository = reviewRepository;
             _mapper = mapper;
+            _pokeRepository = pokemonRepository;
+            _reviewerRepository = reviewerRepository;
         }
 
         // GET Reviews
@@ -58,5 +62,70 @@ namespace PokemonReviewApp.Controllers
              if(!ModelState.IsValid) { return BadRequest(ModelState); } 
              return Ok(reviews);
         }
+
+        // POST Review
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateReview([FromQuery] int reviewerId, [FromQuery] int pokeId, [FromBody]ReviewDto reviewCreate)
+        {
+            if (reviewCreate == null)
+            {
+                return BadRequest(ModelState);
+            }
+            var review = _reviewRepository.GetReviews().Where(r => r.Title.Trim().ToUpper() == reviewCreate.Title.TrimEnd().ToUpper()).FirstOrDefault();
+            if (review != null)
+            {
+                ModelState.AddModelError("", "Review already has exist");
+                return StatusCode(422, ModelState);
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var reviewMap = _mapper.Map<Review>(reviewCreate);
+            reviewMap.Reviewer = _reviewerRepository.GetReviewer(reviewerId);
+            reviewMap.Pokemon = _pokeRepository.GetPokemon(pokeId);
+            if (!_reviewRepository.CreateReview(reviewMap))
+            {
+                ModelState.AddModelError("", "Something was wrong went saving!!!");
+                return StatusCode(500, ModelState);
+            }
+            return Ok("Sucessfully Created!!!");
+
+        }
+
+        // PUT review
+        [HttpPut("{reviewId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateReview(int reviewId,[FromBody]ReviewDto updateReview)
+        {
+            if(updateReview == null)
+                return BadRequest(ModelState);
+
+            if(reviewId != updateReview.Id)
+                return BadRequest(ModelState);
+
+            if (!_reviewRepository.ReviewExist(reviewId))
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var reviewMap = _mapper.Map<Review>(updateReview);
+           
+
+            if (!_reviewRepository.UpdateReview(reviewMap))
+            {
+                ModelState.AddModelError("", "Something was wrong went updating review!!!");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
     }
 }

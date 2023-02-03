@@ -90,7 +90,7 @@ namespace PokemonReviewApp.Controllers
 
             if (!_categoryRepository.CreateCategory(categoryMap))
             {
-                ModelState.AddModelError("", "Some thing went wrong went saving !!!");
+                ModelState.AddModelError("", "Something was wrong went saving !!!");
                 return  StatusCode(500, ModelState);
             }
 
