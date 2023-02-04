@@ -35,7 +35,7 @@ namespace PokemonReviewApp.Repository
             return _context.PokemonOwners.Where(c =>c.OwnerId == ownerId).Select(c => c.Pokemon).ToList();
         }
 
-        public bool OswnerExists(int ownerId)
+        public bool OwnerExists(int ownerId)
         {
             return _context.Owners.Any(c => c.Id == ownerId);
         }
@@ -44,6 +44,12 @@ namespace PokemonReviewApp.Repository
         {
             var saved = _context.SaveChanges();
             return saved > 0 ? true : false;
+        }
+
+        public bool UpdateOwner(Owner owner)
+        {
+            _context.Update(owner);
+            return Save();
         }
     }
 }

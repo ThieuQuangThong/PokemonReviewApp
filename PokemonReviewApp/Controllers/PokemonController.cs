@@ -11,7 +11,7 @@ namespace PokemonReviewApp.Controllers
     [Route("api/[controller]")]
     [ApiController] 
     public class PokemonController : Controller
-    {
+    {   
         private readonly IPokemonRepository _pokemonRepository;
         private readonly IMapper _mapper;
 
@@ -95,6 +95,37 @@ namespace PokemonReviewApp.Controllers
                 return StatusCode(500, ModelState);
             }
             return Ok("Successfully Created!!!");
+        }
+
+        // PUT poke
+        [HttpPut("{pokeId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(200)]
+        public IActionResult UpdatePokemon(int pokeId, [FromQuery] int ownerId, [FromQuery] int catId, [FromBody] PokemonDto updatePokemon)
+        {
+            if (updatePokemon == null)
+                return BadRequest(ModelState);
+
+            if (pokeId != updatePokemon.Id)
+                return BadRequest(ModelState);
+
+            if (!_pokemonRepository.PokemonExist(pokeId))
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var pokemonMap = _mapper.Map<Pokemon>(updatePokemon);
+
+            if (!_pokemonRepository.UpdatePokemon(ownerId, catId, pokemonMap))
+            {
+                ModelState.AddModelError("", "Something was wrong went updating");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+           
         }
     }
 }
