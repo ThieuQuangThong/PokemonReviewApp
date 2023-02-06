@@ -12,7 +12,7 @@ namespace PokemonReviewApp.Controllers
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
-        
+
         public CategoryController(ICategoryRepository categoryRepository, IMapper mapper)
         {
             _categoryRepository = categoryRepository;
@@ -23,14 +23,13 @@ namespace PokemonReviewApp.Controllers
         // GET Categories
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Category>))]
-        public IActionResult GetCategories()
+        public async Task<IActionResult> GetCategories()
         {
-            var categories =_mapper.Map<List<CategoryDto>>(_categoryRepository.GetCategories());
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+            var categories = await _categoryRepository.GetCategories();
             return Ok(categories);
         }
 
@@ -38,11 +37,11 @@ namespace PokemonReviewApp.Controllers
         [HttpGet("{categoryId}")]
         [ProducesResponseType(200, Type = typeof(Category))]
         [ProducesResponseType(400)]
-        public IActionResult GetCategory(int categoryId)
+        public async Task<IActionResult> GetCategory(int categoryId)
         {
-            var category = _mapper.Map<CategoryDto>(_categoryRepository.GetCategory(categoryId));
-        
-            if(!ModelState.IsValid)
+            var category = await _categoryRepository.GetCategory(categoryId);
+
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
 
@@ -54,55 +53,55 @@ namespace PokemonReviewApp.Controllers
         [HttpGet("pokemon/{categoryId}")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Pokemon>))]
         [ProducesResponseType(400)]
-        public IActionResult GetPokemonByCategory(int categoryId)
+        public async Task<IActionResult> GetPokemonByCategory(int categoryId)
         {
-            var pokemons = _mapper.Map<List<PokemonDto>>(_categoryRepository.GetPokemonByCategory(categoryId));
+            var pokemons = await _categoryRepository.GetPokemonByCategory(categoryId);
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return Ok(pokemons);
         }
 
         // POST Category
-        [HttpPost]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        public IActionResult CreateCategory([FromBody] CategoryDto categoryCreate)
-        {
-            if(categoryCreate == null)
-                return BadRequest(ModelState);
+        //[HttpPost]
+        //[ProducesResponseType(204)]
+        //[ProducesResponseType(400)]
+        //public IActionResult CreateCategory([FromBody] CategoryDto categoryCreate)
+        //{
+        //    if (categoryCreate == null)
+        //        return BadRequest(ModelState);
 
-            var category = _categoryRepository.GetCategories().Where(c => c.Name.Trim().ToUpper() == categoryCreate.Name.TrimEnd().ToUpper()).FirstOrDefault();
-             
-            if(category != null)
-            {
-                ModelState.AddModelError("", "Category already exist");
-                return StatusCode(422, ModelState);
-            }
+        //    var category = _categoryRepository.GetCategories().Where(c => c.Name.Trim().ToUpper() == categoryCreate.Name.TrimEnd().ToUpper()).FirstOrDefault();
 
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //    if (category != null)
+        //    {
+        //        ModelState.AddModelError("", "Category already exist");
+        //        return StatusCode(422, ModelState);
+        //    }
 
-            var categoryMap = _mapper.Map<Category>(categoryCreate);
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-            if (!_categoryRepository.CreateCategory(categoryMap))
-            {
-                ModelState.AddModelError("", "Something was wrong went saving !!!");
-                return  StatusCode(500, ModelState);
-            }
+        //    var categoryMap = _mapper.Map<Category>(categoryCreate);
 
-            return Ok("Successfully Created!!!");
-        }
+        //    if (!_categoryRepository.CreateCategory(categoryMap))
+        //    {
+        //        ModelState.AddModelError("", "Something was wrong went saving !!!");
+        //        return StatusCode(500, ModelState);
+        //    }
+
+        //    return Ok("Successfully Created!!!");
+        //}
 
         // PUT category
         [HttpPut("{categoryId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]
-        public IActionResult UpdateCategory(int categoryId, [FromBody]CategoryDto categoryUpdate)
+        public IActionResult UpdateCategory(int categoryId, [FromBody] CategoryDto categoryUpdate)
         {
             if (categoryUpdate == null)
                 return BadRequest(ModelState);
@@ -129,28 +128,28 @@ namespace PokemonReviewApp.Controllers
         }
 
         // DELETE categoryId
-        [HttpDelete("{categoryId}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(200)]
-        public IActionResult DeleteCategory(int categoryId)
-        {
-            if (!_categoryRepository.CategoryExists(categoryId))
-                return NotFound();
+        //[HttpDelete("{categoryId}")]
+        //[ProducesResponseType(400)]
+        //[ProducesResponseType(204)]
+        //[ProducesResponseType(200)]
+        //public IActionResult DeleteCategory(int categoryId)
+        //{
+        //    if (!_categoryRepository.CategoryExists(categoryId))
+        //        return NotFound();
 
-            var categoryToDelete = _categoryRepository.GetCategory(categoryId);
+        //    var categoryToDelete = _categoryRepository.GetCategory(categoryId);
 
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
 
-            if (!_categoryRepository.DeleteCategory(categoryToDelete))
-            {
-                ModelState.AddModelError("", "Something went wrong deleting ");
+        //    if (!_categoryRepository.DeleteCategory(categoryToDelete))
+        //    {
+        //        ModelState.AddModelError("", "Something went wrong deleting ");
 
-            }
+        //    }
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
     }
 }

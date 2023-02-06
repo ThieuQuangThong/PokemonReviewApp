@@ -26,14 +26,22 @@ namespace PokemonReviewApp.Repository
         }
 
 
-        public ICollection<Category> GetCategories()
+        public async Task<List<CategoryDto>> GetCategories()
         {
-            return _context.Categories.OrderBy(c => c.Id).ToList();
+            return await _context.Categories.OrderBy(c => c.Id).Select(c => new CategoryDto
+            {
+                Id = c.Id,
+                Name = c.Name
+            }).ToListAsync();
         }
 
-        public Category GetCategory(int id)
+        public async Task<CategoryDto> GetCategory(int id)
         {
-            return _context.Categories.Where(c => c.Id == id).FirstOrDefault();
+            return await _context.Categories.Where(c => c.Id == id).Select(c => new CategoryDto
+            {
+                Id = c.Id,
+                Name = c.Name
+            }).FirstOrDefaultAsync();
         }
 
         //public Category GetCategory(string name)
@@ -41,16 +49,16 @@ namespace PokemonReviewApp.Repository
         //    throw new NotImplementedException();
         //}
 
-        public ICollection<Pokemon> GetPokemonByCategory(int categoryId)
+        public async Task<List<PokemonDto>> GetPokemonByCategory(int categoryId)
         {
-            return _context.PokemonCategories.Where(c => c.CategoryId == categoryId).Select(c => c.Pokemon).ToList();
+            return await _context.PokemonCategories.Where(c => c.CategoryId == categoryId).Select(c => c.Pokemon).ToListAsync();
         }
 
         public bool Save()
         {
             var saved = _context.SaveChanges();
 
-            return saved >0 ? true : false;
+            return saved > 0 ? true : false;
         }
 
         public bool UpdateCategory(Category category)
