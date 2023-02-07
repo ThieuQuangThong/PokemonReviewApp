@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PokemonReviewApp.Data;
+using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
 
@@ -8,10 +11,12 @@ namespace PokemonReviewApp.Repository
     public class PokemonRepository : IPokemonRepository
     {
         private readonly DataContext _context;
+        private readonly IMapper _mapper;
 
-        public PokemonRepository(DataContext context)
+        public PokemonRepository(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public bool CreatePokemon(int ownerId, int categoryId, Pokemon pokemon)
@@ -30,7 +35,7 @@ namespace PokemonReviewApp.Repository
             var pokemonCategory = new PokemonCategory()
             {
                 Category = pokemonCategoryEntity,
-                Pokemon= pokemon
+                Pokemon = pokemon
             };
 
             _context.Add(pokemonCategory);
@@ -39,15 +44,20 @@ namespace PokemonReviewApp.Repository
             return Save();
         }
 
-        public bool DeletePokemon(Pokemon pokemon)
+        public async Task<bool> DeletePokemon(PokemonDto pokemon)
         {
-            _context.Remove(pokemon);
+            _context.Remove(_mapper.Map<Pokemon>(pokemon));
             return Save();
         }
 
-        public Pokemon GetPokemon(int id)
+        public async Task<PokemonDto> GetPokemon(int id)
         {
-            return _context.Pokemon.Where(p =>p.Id == id).FirstOrDefault();
+            return await _context.Pokemon.Where(p => p.Id == id).Select(p => new PokemonDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                BirthDate = p.BirthDate
+            }).FirstOrDefaultAsync();
         }
 
         public Pokemon GetPokemon(string name)
@@ -55,25 +65,34 @@ namespace PokemonReviewApp.Repository
             return _context.Pokemon.Where(p => p.Name == name).FirstOrDefault();
         }
 
-        public decimal GetPokemonRating(int pokeId)
+        public async Task<decimal> GetPokemonRating(int pokeId)
         {
-            var review = _context.Reviews.Where(p => p.Pokemon.Id == pokeId);
+            var review = await _context.Reviews.Where(p => p.Pokemon.Id == pokeId).Select(r => new Review
+            {
+                Id = r.Id,
+                Rating = r.Rating,
+            }).ToListAsync();
 
-            if(review.Count() <= 0)
+            if (review.Count() <= 0)
             {
                 return 0;
             }
             return ((decimal)review.Sum(r => r.Rating) / review.Count());
         }
 
-        public ICollection<Pokemon> GetPokemons()
+        public async Task<List<PokemonDto>> GetPokemons()
         {
-            return _context.Pokemon.OrderBy(p=> p.Id).ToList();
+            return await _context.Pokemon.OrderBy(p => p.Id).Select(p => new PokemonDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                BirthDate = p.BirthDate,
+            }).ToListAsync();
         }
 
         public bool PokemonExist(int pokeId)
         {
-            return _context.Pokemon.Any(p =>p.Id ==pokeId);
+            return _context.Pokemon.Any(p => p.Id == pokeId);
         }
 
         public bool Save()

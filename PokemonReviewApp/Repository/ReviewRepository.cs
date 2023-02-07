@@ -1,14 +1,16 @@
-﻿using PokemonReviewApp.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using PokemonReviewApp.Data;
+using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Repository
 {
     public class ReviewRepository : IReviewRepository
-       
+
     {
         private readonly DataContext _context;
-        public ReviewRepository(DataContext context) 
+        public ReviewRepository(DataContext context)
         {
             _context = context;
         }
@@ -31,19 +33,37 @@ namespace PokemonReviewApp.Repository
             return Save();
         }
 
-        public Review GetReview(int id)
+        public async Task<ReviewDto> GetReview(int id)
         {
-            return _context.Reviews.Where(r => r.Id == id).FirstOrDefault();
+            return await _context.Reviews.Where(r => r.Id == id).Select(r => new ReviewDto
+            {
+                Id = r.Id,
+                Title = r.Title,
+                Rating = r.Rating,
+                Text = r.Text,
+            }).FirstOrDefaultAsync();
         }
 
-        public ICollection<Review> GetReviewOfAPokemon(int pokeId)
+        public async Task<List<ReviewDto>> GetReviewOfAPokemon(int pokeId)
         {
-            return _context.Reviews.Where(r => r.Pokemon.Id == pokeId).ToList();
+            return await _context.Reviews.Where(r => r.Pokemon.Id == pokeId).Select(p => new ReviewDto
+            {
+                Id = p.Id,
+                Title = p.Title,
+                Rating = p.Rating,
+                Text = p.Text,
+            }).ToListAsync();
         }
 
-        public ICollection<Review> GetReviews()
+        public async Task<List<ReviewDto>> GetReviews()
         {
-            return _context.Reviews.OrderBy(r => r.Id).ToList();
+            return await _context.Reviews.OrderBy(r => r.Id).Select(r => new ReviewDto
+            {
+                Id = r.Id,
+                Title = r.Title,
+                Rating = r.Rating,
+                Text = r.Text,
+            }).ToListAsync();
         }
 
         public bool ReviewExist(int id)

@@ -9,9 +9,10 @@ namespace PokemonReviewApp.Interfaces
         Task<CategoryDto> GetCategory(int id);
         Task<List<PokemonDto>> GetPokemonByCategory(int categoryId);
         bool CategoryExists(int id);
-        bool CreateCategory(Category category);
-        bool UpdateCategory(Category category);
-        bool DeleteCategory(Category category);
-        bool Save();
+        bool CategoriesExists(string name);
+        Task<bool> CreateCategory(CategoryDto category);
+        Task<bool> UpdateCategory(CategoryDto category);
+        Task<bool> DeleteCategory(CategoryDto category);
+        Task<bool> Save();
     }
 }

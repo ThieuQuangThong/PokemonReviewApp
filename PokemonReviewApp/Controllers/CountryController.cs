@@ -9,7 +9,7 @@ namespace PokemonReviewApp.Controllers
     [Route("api/[controller]")]
     [ApiController]
 
-    public class CountryController :Controller
+    public class CountryController : Controller
     {
         private readonly ICountryRepository _countryRepository;
         private readonly IMapper _mapper;
@@ -22,59 +22,67 @@ namespace PokemonReviewApp.Controllers
         // GET Countries
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Country>))]
-        public IActionResult GetCountries() 
+        public async Task<IActionResult> GetCountries()
         {
-            var countries = _mapper.Map<List<CountryDto>>(_countryRepository.GetCountries());
-            if(!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                var countries = await _countryRepository.GetCountries();
+                return Ok(countries);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Something went wrong getting data");
+                return StatusCode(500, ex.Message);
             }
 
-            return Ok(countries);   
         }
 
         // GET Country/id
         [HttpGet("{countryId}")]
         [ProducesResponseType(200, Type = typeof(Country))]
-        public IActionResult GetCountry(int countryId)
+        public async Task<IActionResult> GetCountry(int countryId)
         {
-            var country = _mapper.Map<CountryDto>(_countryRepository.GetCountry(countryId));
-
-            if(!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                var countryFound = await _countryRepository.GetCountry(countryId);
+                return Ok(countryFound);
             }
-            return Ok(country);
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Something wrong when getting data");
+                return StatusCode(500, ex.Message);
+            }
         }
 
         // POST Country
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult PostCountry([FromBody]CountryDto countryCreate)
+        public async Task<IActionResult> PostCountry([FromBody] CountryDto countryCreate)
         {
-            if(countryCreate == null)
+            if (countryCreate == null)
                 return BadRequest(ModelState);
 
-            var country = _countryRepository.GetCountries().Where(c => c.Name.Trim().ToUpper() == countryCreate.Name.TrimEnd().ToUpper()).FirstOrDefault();
 
-            if(country != null)
+            if (_countryRepository.CountryExists(countryCreate.Name))
             {
-                ModelState.AddModelError("", "Owner already exist");
+                ModelState.AddModelError("", "Country already exist");
                 return StatusCode(422, ModelState);
             }
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             { return BadRequest(ModelState); }
 
-            var countryMap = _mapper.Map<Country>(countryCreate);
-
-            if (!_countryRepository.CreateCountry(countryMap))
+            try
             {
-                ModelState.AddModelError("", "Something was wrong went saving !!!");
+                await _countryRepository.CreateCountry(countryCreate);
+                return Ok(countryCreate);
+            }
+            catch (Exception ex)
+            {
                 return StatusCode(500, ModelState);
             }
-            return Ok("Succesfully Created!!!");
+
         }
 
         // PUT Country
@@ -82,7 +90,7 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]
-        public IActionResult UpdateCountry(int countryId,[FromBody] CountryDto countryUpdate)
+        public async Task<IActionResult> UpdateCountry(int countryId, [FromBody] CountryDto countryUpdate)
         {
             if (countryUpdate == null)
                 return BadRequest(ModelState);
@@ -93,33 +101,39 @@ namespace PokemonReviewApp.Controllers
             if (!_countryRepository.CountryExist(countryId))
                 return BadRequest(ModelState);
 
-            var countryMap = _mapper.Map<Country>(countryUpdate);
-            if (!_countryRepository.UpdateCountry(countryMap))
+            try
             {
-                ModelState.AddModelError("", "Something was wrong went saving");
+                await _countryRepository.UpdateCountry(countryUpdate);
+                return Ok(countryUpdate);
+            }
+            catch (Exception ex)
+            {
                 return StatusCode(500, ModelState);
             }
 
-            return NoContent();
         }
-
+        // DELETE countryId
         [HttpDelete("{countryId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]
-        public IActionResult DeleteCountry(int countryId)
+        public async Task<IActionResult> DeleteCountry(int countryId)
         {
-            if(!_countryRepository.CountryExist(countryId))
+            if (!_countryRepository.CountryExist(countryId))
                 return NotFound();
 
-            var countryToDelete = _countryRepository.GetCountry(countryId);
+            var countryToDelete = await _countryRepository.GetCountry(countryId);
 
-            if (!_countryRepository.DeleteCountry(countryToDelete))
+            try
             {
-                ModelState.AddModelError("", "Somethin went wrong deleting!!!");
+                _countryRepository.DeleteCountry(countryToDelete);
+                return Ok(countryToDelete);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ModelState);
             }
 
-            return NoContent();
         }
     }
 }

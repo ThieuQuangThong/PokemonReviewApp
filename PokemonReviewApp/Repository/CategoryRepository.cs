@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using PokemonReviewApp.Data;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
+using AutoMapper;
 using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Repository
@@ -10,19 +11,22 @@ namespace PokemonReviewApp.Repository
     public class CategoryRepository : ICategoryRepository
     {
         private readonly DataContext _context;
-        public CategoryRepository(DataContext context)
+        private readonly IMapper _mapper;
+        public CategoryRepository(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         public bool CategoryExists(int categoryId)
         {
             return _context.Categories.Any(c => c.Id == categoryId);
         }
 
-        public bool CreateCategory(Category category)
+        public async Task<bool> CreateCategory(CategoryDto category)
         {
-            _context.Add(category);
-            return Save();
+            await _context.AddAsync(_mapper.Map<Category>(category));
+            await _context.SaveChangesAsync();
+            return await Save();
         }
 
 
@@ -44,33 +48,40 @@ namespace PokemonReviewApp.Repository
             }).FirstOrDefaultAsync();
         }
 
-        //public Category GetCategory(string name)
-        //{
-        //    throw new NotImplementedException();
-        //}
 
         public async Task<List<PokemonDto>> GetPokemonByCategory(int categoryId)
         {
-            return await _context.PokemonCategories.Where(c => c.CategoryId == categoryId).Select(c => c.Pokemon).ToListAsync();
+            return await _context.PokemonCategories.Where(c => c.CategoryId == categoryId).Select(p => new PokemonDto
+            {
+                Name = p.Pokemon.Name,
+                BirthDate = p.Pokemon.BirthDate
+            }).ToListAsync();
         }
 
-        public bool Save()
+        public async Task<bool> Save()
         {
-            var saved = _context.SaveChanges();
+            var saved = await _context.SaveChangesAsync();
 
             return saved > 0 ? true : false;
         }
 
-        public bool UpdateCategory(Category category)
+        public async Task<bool> UpdateCategory(CategoryDto category)
         {
-            _context.Update(category);
-            return Save();
+            _context.Update(_mapper.Map<Category>(category));
+            await _context.SaveChangesAsync();
+            return await Save();
         }
 
-        public bool DeleteCategory(Category category)
+        public async Task<bool> DeleteCategory(CategoryDto category)
         {
-            _context.Remove(category);
-            return Save();
+            _context.Remove(_mapper.Map<Category>(category));
+            await _context.SaveChangesAsync();
+            return await Save();
+        }
+
+        public bool CategoriesExists(string name)
+        {
+            return _context.Categories.Any(c => c.Name == name);
         }
     }
 }
