@@ -1,14 +1,16 @@
-﻿using PokemonReviewApp.Models;
+﻿using PokemonReviewApp.Dto;
+using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Interfaces
 {
     public interface IOwnerRepository
     {
-        ICollection<Owner> GetOwners();
-        Owner GetOwner(int ownerId);
-        ICollection<Pokemon> GetPokemonsByOwner(int ownerId);
+        Task<List<OwnerDto>> GetOwners();
+        Task<OwnerDto> GetOwner(int ownerId);
+        Task<List<PokemonDto>> GetPokemonsByOwner(int ownerId);
         bool OwnerExists(int ownerId);
-        bool CreateOwner (Owner owner);
+        Task<bool> OwnerExists(string ownerName);
+        Task<bool> CreateOwner(int countryId, OwnerDto owner);
         bool UpdateOwner(Owner owner);
         bool DeleteOwner(Owner owner);
         bool Save();

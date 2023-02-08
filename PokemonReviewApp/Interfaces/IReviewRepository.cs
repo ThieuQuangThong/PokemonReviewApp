@@ -9,9 +9,9 @@ namespace PokemonReviewApp.Interfaces
         Task<ReviewDto> GetReview(int id);
         Task<List<ReviewDto>> GetReviewOfAPokemon(int pokeId);
         bool ReviewExist(int id);
-        bool CreateReview(Review review);
-        bool UpdateReview(Review review);
-        bool DeleteReview(Review review);
+        Task<bool> CreateReview(int reviewerId, int pokeId, ReviewDto review);
+        Task<bool> UpdateReview(ReviewDto review);
+        Task<bool> DeleteReview(ReviewDto review);
         bool DeleteReviews(List<Review> reviews);
 
         bool Save();

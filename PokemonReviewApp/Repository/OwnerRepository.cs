@@ -1,4 +1,7 @@
-﻿using PokemonReviewApp.Data;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using PokemonReviewApp.Data;
+using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
 
@@ -7,14 +10,18 @@ namespace PokemonReviewApp.Repository
     public class OwnerRepository : IOwnerRepository
     {
         private readonly DataContext _context;
-        public OwnerRepository(DataContext context) 
+        private readonly IMapper _mapper;
+        public OwnerRepository(DataContext context, IMapper mapper)
         {
-            _context= context;
+            _context = context;
+            _mapper = mapper;
         }
 
-        public bool CreateOwner(Owner owner)
+        public async Task<bool> CreateOwner(int CountryId, OwnerDto owner)
         {
-            _context.Add(owner);
+            var ownerToCreate = _mapper.Map<Owner>(owner);
+            ownerToCreate.Country = await _context.Countries.Where(c => c.Id == CountryId).FirstOrDefaultAsync();
+            await _context.AddAsync(ownerToCreate);
             return Save();
         }
 
@@ -24,26 +31,48 @@ namespace PokemonReviewApp.Repository
             return Save();
         }
 
-        public Owner GetOwner(int ownerId)
+        public async Task<OwnerDto> GetOwner(int ownerId)
         {
-            return _context.Owners.Where(c => c.Id == ownerId).FirstOrDefault();
+            return await _context.Owners.Where(c => c.Id == ownerId).Select(o => new OwnerDto
+            {
+                Id = o.Id,
+                FirstName = o.FirstName,
+                LastName = o.LastName,
+                Gym = o.Gym
+            }).FirstOrDefaultAsync();
 
         }
 
-        public ICollection<Owner> GetOwners()
+        public async Task<List<OwnerDto>> GetOwners()
         {
-            return _context.Owners.ToList();
+            return await _context.Owners.Select(o => new OwnerDto
+            {
+                Id = o.Id,
+                FirstName = o.FirstName,
+                LastName = o.LastName,
+                Gym = o.Gym
+            }).ToListAsync();
 
         }
 
-        public ICollection<Pokemon> GetPokemonsByOwner(int ownerId)
+        public async Task<List<PokemonDto>> GetPokemonsByOwner(int ownerId)
         {
-            return _context.PokemonOwners.Where(c =>c.OwnerId == ownerId).Select(c => c.Pokemon).ToList();
+            return await _context.PokemonOwners.Where(c => c.OwnerId == ownerId).Select(c => new PokemonDto
+            {
+                Id = c.Pokemon.Id,
+                Name = c.Pokemon.Name,
+                BirthDate = c.Pokemon.BirthDate,
+            }).ToListAsync();
         }
 
         public bool OwnerExists(int ownerId)
         {
             return _context.Owners.Any(c => c.Id == ownerId);
+        }
+
+        public async Task<bool> OwnerExists(string ownerName)
+        {
+            return await _context.Owners.AnyAsync(c => c.LastName == ownerName);
         }
 
         public bool Save()

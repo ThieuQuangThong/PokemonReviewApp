@@ -107,7 +107,7 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]
-        public IActionResult UpdatePokemon(int pokeId, [FromQuery] int ownerId, [FromQuery] int catId, [FromBody] PokemonDto updatePokemon)
+        public async Task<IActionResult> UpdatePokemon(int pokeId, [FromQuery] int ownerId, [FromQuery] int catId, [FromBody] PokemonDto updatePokemon)
         {
             if (updatePokemon == null)
                 return BadRequest(ModelState);
@@ -121,15 +121,15 @@ namespace PokemonReviewApp.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var pokemonMap = _mapper.Map<Pokemon>(updatePokemon);
-
-            if (!_pokemonRepository.UpdatePokemon(ownerId, catId, pokemonMap))
+            try
             {
-                ModelState.AddModelError("", "Something was wrong went updating");
-                return StatusCode(500, ModelState);
+                await _pokemonRepository.UpdatePokemon(ownerId, catId, updatePokemon);
+                return Ok(updatePokemon);
             }
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
 
         }
 

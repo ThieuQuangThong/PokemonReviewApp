@@ -101,9 +101,9 @@ namespace PokemonReviewApp.Repository
             return saved > 0 ? true : false;
         }
 
-        public bool UpdatePokemon(int ownerId, int categoryId, Pokemon pokemonUpdate)
+        public async Task<bool> UpdatePokemon(int ownerId, int categoryId, PokemonDto pokemonUpdate)
         {
-            _context.Update(pokemonUpdate);
+            _context.Update(_mapper.Map<Pokemon>(pokemonUpdate));
             return Save();
 
         }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using PokemonReviewApp.Data;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
@@ -10,20 +11,29 @@ namespace PokemonReviewApp.Repository
 
     {
         private readonly DataContext _context;
-        public ReviewRepository(DataContext context)
+        private readonly IMapper _mapper;
+        private readonly IReviewerRepository _reviewerRepository;
+        private readonly IPokemonRepository _pokemonRepository;
+        public ReviewRepository(DataContext context, IMapper mapper, IReviewerRepository reviewerRepository, IPokemonRepository pokemonRepository)
         {
+            _mapper = mapper;
             _context = context;
+            _reviewerRepository = reviewerRepository;
+            _pokemonRepository = pokemonRepository;
         }
 
-        public bool CreateReview(Review review)
+        public async Task<bool> CreateReview(int reviewerId, int pokeId, ReviewDto review)
         {
-            _context.Add(review);
+            var reviewToCreate = _mapper.Map<Review>(review);
+            reviewToCreate.Reviewer = await _context.Reviewers.Where(r => r.Id == reviewerId).FirstOrDefaultAsync();
+            reviewToCreate.Pokemon = await _context.Pokemon.Where(p => p.Id == pokeId).FirstOrDefaultAsync();
+            await _context.Reviews.AddAsync(reviewToCreate);
             return Save();
         }
 
-        public bool DeleteReview(Review review)
+        public async Task<bool> DeleteReview(ReviewDto review)
         {
-            _context.Remove(review);
+            _context.Remove(_mapper.Map<Review>(review));
             return Save();
         }
 
@@ -77,9 +87,9 @@ namespace PokemonReviewApp.Repository
             return saved > 0 ? true : false;
         }
 
-        public bool UpdateReview(Review review)
+        public async Task<bool> UpdateReview(ReviewDto review)
         {
-            _context.Update(review);
+            _context.Update(_mapper.Map<Review>(review));
             return Save();
         }
     }

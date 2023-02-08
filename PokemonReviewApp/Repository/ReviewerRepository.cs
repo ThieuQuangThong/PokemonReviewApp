@@ -1,4 +1,7 @@
-﻿using PokemonReviewApp.Data;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using PokemonReviewApp.Data;
+using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
 
@@ -7,38 +10,50 @@ namespace PokemonReviewApp.Repository
     public class ReviewerRepository : IReviewerRepository
     {
         private readonly DataContext _context;
-        
-        public ReviewerRepository( DataContext context)
+        private readonly IMapper _mapper;
+
+        public ReviewerRepository(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
 
-        public bool CreateReviewer(Reviewer reviewer)
+        public async Task<bool> CreateReviewer(ReviewerDto reviewer)
         {
-            _context.Add(reviewer);
+            await _context.AddAsync(_mapper.Map<Reviewer>(reviewer));
             return Save();
         }
 
-        public bool DeleteReviewer(Reviewer reviewer)
+        public async Task<bool> DeleteReviewer(ReviewerDto reviewer)
         {
-            _context.Remove(reviewer);
+            _context.Remove(_mapper.Map<Reviewer>(reviewer));
             return Save();
         }
 
-        public Reviewer GetReviewer(int reviewerId)
+        public async Task<ReviewerDto> GetReviewer(int reviewerId)
         {
-            return _context.Reviewers.Where(c=>c.Id ==reviewerId).FirstOrDefault();
+            return await _context.Reviewers.Where(c => c.Id == reviewerId).Select(r => new ReviewerDto
+            {
+                Id = r.Id,
+                FirstName = r.FirstName,
+                LastName = r.LastName,
+            }).FirstOrDefaultAsync();
         }
 
-        public ICollection<Reviewer> GetReviewers()
+        public async Task<List<ReviewerDto>> GetReviewers()
         {
-            return _context.Reviewers.ToList();
+            return await _context.Reviewers.Select(r => new ReviewerDto
+            {
+                Id = r.Id,
+                FirstName = r.FirstName,
+                LastName = r.LastName,
+            }).ToListAsync();
         }
 
         public ICollection<Review> GetReviewOfReviewer(int reviewerId)
         {
-            return _context.Reviews.Where( c=> c.Reviewer.Id == reviewerId).ToList();
+            return _context.Reviews.Where(c => c.Reviewer.Id == reviewerId).ToList();
         }
 
         public bool ReviewerExists(int reviewerId)
@@ -46,15 +61,21 @@ namespace PokemonReviewApp.Repository
             return _context.Reviewers.Any(c => c.Id == reviewerId);
         }
 
+        public bool ReviewerExists(string name)
+        {
+            return _context.Reviewers.Any(c => c.LastName == name);
+
+        }
+
         public bool Save()
         {
             var saved = _context.SaveChanges();
-            return saved >0 ? true : false;
+            return saved > 0 ? true : false;
         }
 
-        public bool UpdateReviewer(Reviewer reviewer)
+        public async Task<bool> UpdateReviewer(ReviewerDto reviewer)
         {
-            _context.Update(reviewer);
+            _context.Update(_mapper.Map<Reviewer>(reviewer));
             return Save();
         }
     }
