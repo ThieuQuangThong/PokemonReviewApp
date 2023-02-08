@@ -79,9 +79,9 @@ namespace PokemonReviewApp.Controllers
             if (ownerCreate == null)
                 return BadRequest(ModelState);
 
-            var owner = await _ownerRepository.OwnerExists(ownerCreate.LastName);
+            var owner = _ownerRepository.OwnerExists(ownerCreate.LastName);
 
-            if (!owner == null)
+            if (owner)
             {
                 ModelState.AddModelError("", "Owner already Exist !!!");
                 return StatusCode(422, ModelState);
@@ -93,7 +93,7 @@ namespace PokemonReviewApp.Controllers
             }
             try
             {
-                var ownerToCreate = _ownerRepository.CreateOwner(countryId, ownerCreate);
+                var ownerToCreate = await _ownerRepository.CreateOwner(countryId, ownerCreate);
                 return Ok(ownerToCreate);
             }
             catch (Exception ex)
@@ -107,7 +107,7 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]
-        public IActionResult UpdateOwner(int ownerId, [FromBody] OwnerDto ownerUpdate)
+        public async Task<IActionResult> UpdateOwner(int ownerId, [FromBody] OwnerDto ownerUpdate)
         {
             if (ownerUpdate == null)
                 return BadRequest(ModelState);
@@ -118,33 +118,38 @@ namespace PokemonReviewApp.Controllers
             if (!_ownerRepository.OwnerExists(ownerId))
                 return NotFound();
 
-            var ownerMap = _mapper.Map<Owner>(ownerUpdate);
-
-            if (!ModelState.IsValid)
-                ModelState.AddModelError("", "Something was wrong went saving");
-            return StatusCode(500, ModelState);
-
-            return NoContent();
+            try
+            {
+                await _ownerRepository.UpdateOwner(ownerUpdate);
+                return Ok(ownerUpdate);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         // DELETE owner
-        //[HttpDelete("{ownerId}")]
-        //[ProducesResponseType(400)]
-        //[ProducesResponseType(204)]
-        //[ProducesResponseType(200)]
-        //public IActionResult DeleteOwner(int ownerId)
-        //{
-        //    if (!_countryRepository.CountryExist(ownerId))
-        //        return BadRequest(ModelState);
+        [HttpDelete("{ownerId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> DeleteOwner(int ownerId)
+        {
+            if (!_countryRepository.CountryExist(ownerId))
+                return BadRequest(ModelState);
 
-        //    var ownerToDelete = _ownerRepository.GetOwner(ownerId);
+            var ownerToDelete =await _ownerRepository.GetOwner(ownerId);
 
-        //    if (!_ownerRepository.DeleteOwner(ownerToDelete))
-        //    {
-        //        ModelState.AddModelError("", "Something went wrong deleting !!!");
-        //    }
-
-        //    return NoContent();
-        //}
+            try
+            {
+                await _ownerRepository.DeleteOwner(ownerToDelete);
+                return Ok(ownerToDelete);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }

@@ -9,10 +9,10 @@ namespace PokemonReviewApp.Interfaces
         Task<OwnerDto> GetOwner(int ownerId);
         Task<List<PokemonDto>> GetPokemonsByOwner(int ownerId);
         bool OwnerExists(int ownerId);
-        Task<bool> OwnerExists(string ownerName);
+        bool OwnerExists(string ownerName);
         Task<bool> CreateOwner(int countryId, OwnerDto owner);
-        bool UpdateOwner(Owner owner);
-        bool DeleteOwner(Owner owner);
+        Task<bool> UpdateOwner(OwnerDto owner);
+        Task<bool> DeleteOwner(OwnerDto owner);
         bool Save();
     }
 }

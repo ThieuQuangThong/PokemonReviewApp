@@ -19,28 +19,29 @@ namespace PokemonReviewApp.Repository
             _mapper = mapper;
         }
 
-        public bool CreatePokemon(int ownerId, int categoryId, Pokemon pokemon)
+        public async Task<bool> CreatePokemon(int ownerId, int categoryId, PokemonDto pokemon)
         {
-            var pokemonOwnerEntity = _context.Owners.Where(o => o.Id == ownerId).FirstOrDefault();
-            var pokemonCategoryEntity = _context.Categories.Where(c => c.Id == categoryId).FirstOrDefault();
+            var pokemonOwnerEntity = await _context.Owners.Where(o => o.Id == ownerId).FirstOrDefaultAsync();
+            var pokemonCategoryEntity = await _context.Categories.Where(c => c.Id == categoryId).FirstOrDefaultAsync();
+            var pokemonMap = _mapper.Map<Pokemon>(pokemon);
 
             var pokemonOwner = new PokemonOwner()
             {
                 Owner = pokemonOwnerEntity,
-                Pokemon = pokemon
+                Pokemon = pokemonMap
             };
 
-            _context.Add(pokemonOwner);
+            await _context.AddAsync(pokemonOwner);
 
             var pokemonCategory = new PokemonCategory()
             {
                 Category = pokemonCategoryEntity,
-                Pokemon = pokemon
+                Pokemon = pokemonMap
             };
 
-            _context.Add(pokemonCategory);
+            await _context.AddAsync(pokemonCategory);
 
-            _context.Add(pokemon);
+            await _context.AddAsync(pokemonMap);
             return Save();
         }
 
@@ -93,6 +94,11 @@ namespace PokemonReviewApp.Repository
         public bool PokemonExist(int pokeId)
         {
             return _context.Pokemon.Any(p => p.Id == pokeId);
+        }
+
+        public bool PokemonExist(string pokeName)
+        {
+            return _context.Pokemon.Any(p => p.Name ==pokeName);
         }
 
         public bool Save()

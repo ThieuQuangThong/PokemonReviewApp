@@ -10,7 +10,8 @@ namespace PokemonReviewApp.Interfaces
         Pokemon GetPokemon(string name);
         Task<decimal> GetPokemonRating(int pokeId);
         bool PokemonExist(int pokeId);
-        bool CreatePokemon(int ownerId, int categoryId, Pokemon pokemon);
+        bool PokemonExist(string pokeName);
+        Task<bool> CreatePokemon(int ownerId, int categoryId, PokemonDto pokemon);
         Task<bool> UpdatePokemon(int ownerId, int categoryId, PokemonDto pokemon);
         Task<bool> DeletePokemon(PokemonDto pokemon);
         bool Save();
