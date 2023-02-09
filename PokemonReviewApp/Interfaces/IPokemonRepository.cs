@@ -14,6 +14,6 @@ namespace PokemonReviewApp.Interfaces
         Task<bool> CreatePokemon(int ownerId, int categoryId, PokemonDto pokemon);
         Task<bool> UpdatePokemon(int ownerId, int categoryId, PokemonDto pokemon);
         Task<bool> DeletePokemon(PokemonDto pokemon);
-        bool Save();
+        Task<bool> Save();
     }
 }

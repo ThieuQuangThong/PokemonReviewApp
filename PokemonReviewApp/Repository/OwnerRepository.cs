@@ -22,13 +22,13 @@ namespace PokemonReviewApp.Repository
             var ownerToCreate = _mapper.Map<Owner>(owner);
             ownerToCreate.Country = await _context.Countries.Where(c => c.Id == CountryId).FirstOrDefaultAsync();
             await _context.Owners.AddAsync(ownerToCreate);
-            return Save();
+            return await Save();
         }
 
         public async Task<bool> DeleteOwner(OwnerDto owner)
         {
             _context.Remove(_mapper.Map<Owner>(owner));
-            return Save();
+            return await Save();
         }
 
         public async Task<OwnerDto> GetOwner(int ownerId)
@@ -75,7 +75,7 @@ namespace PokemonReviewApp.Repository
             return _context.Owners.Any(c => c.LastName == ownerName);
         }
 
-        public bool Save()
+        public async Task<bool> Save()
         {
             var saved = _context.SaveChanges();
             return saved > 0 ? true : false;
@@ -84,7 +84,7 @@ namespace PokemonReviewApp.Repository
         public async Task<bool> UpdateOwner(OwnerDto owner)
         {
             _context.Update(_mapper.Map<Owner>(owner));
-            return Save();
+            return await Save();
         }
     }
 }

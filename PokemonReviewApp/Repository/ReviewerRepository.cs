@@ -22,18 +22,18 @@ namespace PokemonReviewApp.Repository
         public async Task<bool> CreateReviewer(ReviewerDto reviewer)
         {
             await _context.AddAsync(_mapper.Map<Reviewer>(reviewer));
-            return Save();
+            return await Save();
         }
 
         public async Task<bool> DeleteReviewer(ReviewerDto reviewer)
         {
             _context.Remove(_mapper.Map<Reviewer>(reviewer));
-            return Save();
+            return await Save();
         }
 
         public async Task<ReviewerDto> GetReviewer(int reviewerId)
         {
-            return await _context.Reviewers.Where(c => c.Id == reviewerId).Select(r => new ReviewerDto
+            return await _context.Reviewers.Where(c => c.Id == reviewerId).AsNoTracking().Select(r => new ReviewerDto
             {
                 Id = r.Id,
                 FirstName = r.FirstName,
@@ -43,7 +43,7 @@ namespace PokemonReviewApp.Repository
 
         public async Task<List<ReviewerDto>> GetReviewers()
         {
-            return await _context.Reviewers.Select(r => new ReviewerDto
+            return await _context.Reviewers.AsNoTracking().Select(r => new ReviewerDto
             {
                 Id = r.Id,
                 FirstName = r.FirstName,
@@ -67,16 +67,16 @@ namespace PokemonReviewApp.Repository
 
         }
 
-        public bool Save()
+        public async Task<bool> Save()
         {
-            var saved = _context.SaveChanges();
+            var saved = await _context.SaveChangesAsync();
             return saved > 0 ? true : false;
         }
 
         public async Task<bool> UpdateReviewer(ReviewerDto reviewer)
         {
             _context.Update(_mapper.Map<Reviewer>(reviewer));
-            return Save();
+            return await Save();
         }
     }
 }

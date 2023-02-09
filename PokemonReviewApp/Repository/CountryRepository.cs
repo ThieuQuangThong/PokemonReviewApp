@@ -32,13 +32,13 @@ namespace PokemonReviewApp.Repository
         {
             await _context.AddAsync(_mapper.Map<Country>(country));
             await _context.SaveChangesAsync();
-            return Save();
+            return await Save();
         }
 
         public async Task<bool> DeleteCountry(CountryDto country)
         {
             _context.Remove(_mapper.Map<Country>(country));
-            return Save();
+            return await Save();
         }
 
         public async Task<List<CountryDto>> GetCountries()
@@ -59,16 +59,16 @@ namespace PokemonReviewApp.Repository
             }).FirstOrDefaultAsync();
         }
 
-        public bool Save()
+        public async Task<bool> Save()
         {
-            var saved = _context.SaveChanges();
+            var saved = await _context.SaveChangesAsync();
             return saved > 0 ? true : false;
         }
 
         public async Task<bool> UpdateCountry(CountryDto country)
         {
             _context.Update(_mapper.Map<Country>(country));
-            return Save();
+            return await Save();
         }
     }
 }

@@ -13,6 +13,6 @@ namespace PokemonReviewApp.Interfaces
         Task<bool> CreateOwner(int countryId, OwnerDto owner);
         Task<bool> UpdateOwner(OwnerDto owner);
         Task<bool> DeleteOwner(OwnerDto owner);
-        bool Save();
+        Task<bool> Save();
     }
 }

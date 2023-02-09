@@ -32,7 +32,7 @@ namespace PokemonReviewApp.Repository
 
         public async Task<List<CategoryDto>> GetCategories()
         {
-            return await _context.Categories.OrderBy(c => c.Id).Select(c => new CategoryDto
+            return await _context.Categories.AsNoTracking().OrderBy(c => c.Id).Select(c => new CategoryDto
             {
                 Id = c.Id,
                 Name = c.Name

@@ -13,6 +13,6 @@ namespace PokemonReviewApp.Interfaces
         Task<bool> CreateReviewer(ReviewerDto reviewer);
         Task<bool> UpdateReviewer(ReviewerDto reviewer);
         Task<bool> DeleteReviewer(ReviewerDto reviewer);
-        bool Save();
+        Task<bool> Save();
     }
 }

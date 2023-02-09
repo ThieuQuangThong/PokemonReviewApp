@@ -28,24 +28,24 @@ namespace PokemonReviewApp.Repository
             reviewToCreate.Reviewer = await _context.Reviewers.Where(r => r.Id == reviewerId).FirstOrDefaultAsync();
             reviewToCreate.Pokemon = await _context.Pokemon.Where(p => p.Id == pokeId).FirstOrDefaultAsync();
             await _context.Reviews.AddAsync(reviewToCreate);
-            return Save();
+            return await Save();
         }
 
         public async Task<bool> DeleteReview(ReviewDto review)
         {
             _context.Remove(_mapper.Map<Review>(review));
-            return Save();
+            return await Save();
         }
 
-        public bool DeleteReviews(List<Review> reviews)
+        public async Task<bool> DeleteReviews(List<Review> reviews)
         {
             _context.RemoveRange(reviews);
-            return Save();
+            return await Save();
         }
 
         public async Task<ReviewDto> GetReview(int id)
         {
-            return await _context.Reviews.Where(r => r.Id == id).Select(r => new ReviewDto
+            return await _context.Reviews.Where(r => r.Id == id).AsNoTracking().Select(r => new ReviewDto
             {
                 Id = r.Id,
                 Title = r.Title,
@@ -67,7 +67,7 @@ namespace PokemonReviewApp.Repository
 
         public async Task<List<ReviewDto>> GetReviews()
         {
-            return await _context.Reviews.OrderBy(r => r.Id).Select(r => new ReviewDto
+            return await _context.Reviews.OrderBy(r => r.Id).AsNoTracking().Select(r => new ReviewDto
             {
                 Id = r.Id,
                 Title = r.Title,
@@ -81,16 +81,16 @@ namespace PokemonReviewApp.Repository
             return _context.Reviews.Any(r => r.Id == id);
         }
 
-        public bool Save()
+        public async Task<bool> Save()
         {
-            var saved = _context.SaveChanges();
+            var saved = await _context.SaveChangesAsync();
             return saved > 0 ? true : false;
         }
 
         public async Task<bool> UpdateReview(ReviewDto review)
         {
             _context.Update(_mapper.Map<Review>(review));
-            return Save();
+            return await Save();
         }
     }
 }

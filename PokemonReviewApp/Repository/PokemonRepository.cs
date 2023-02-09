@@ -42,13 +42,13 @@ namespace PokemonReviewApp.Repository
             await _context.AddAsync(pokemonCategory);
 
             await _context.AddAsync(pokemonMap);
-            return Save();
+            return await Save();
         }
 
         public async Task<bool> DeletePokemon(PokemonDto pokemon)
         {
             _context.Remove(_mapper.Map<Pokemon>(pokemon));
-            return Save();
+            return await Save();
         }
 
         public async Task<PokemonDto> GetPokemon(int id)
@@ -98,19 +98,19 @@ namespace PokemonReviewApp.Repository
 
         public bool PokemonExist(string pokeName)
         {
-            return _context.Pokemon.Any(p => p.Name ==pokeName);
+            return _context.Pokemon.Any(p => p.Name == pokeName);
         }
 
-        public bool Save()
+        public async Task<bool> Save()
         {
-            var saved = _context.SaveChanges();
+            var saved = await _context.SaveChangesAsync();
             return saved > 0 ? true : false;
         }
 
         public async Task<bool> UpdatePokemon(int ownerId, int categoryId, PokemonDto pokemonUpdate)
         {
             _context.Update(_mapper.Map<Pokemon>(pokemonUpdate));
-            return Save();
+            return await Save();
 
         }
     }

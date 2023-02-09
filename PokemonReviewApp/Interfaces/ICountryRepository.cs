@@ -12,6 +12,6 @@ namespace PokemonReviewApp.Interfaces
         Task<bool> CreateCountry(CountryDto country);
         Task<bool> UpdateCountry(CountryDto country);
         Task<bool> DeleteCountry(CountryDto country);
-        bool Save();
+        Task<bool> Save();
     }
 }
