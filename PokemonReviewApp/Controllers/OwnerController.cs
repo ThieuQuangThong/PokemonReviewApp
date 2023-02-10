@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
@@ -6,6 +7,7 @@ using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class OwnerController : Controller
@@ -72,6 +74,8 @@ namespace PokemonReviewApp.Controllers
 
         // POST Owner
         [HttpPost]
+        [Authorize(Roles = "Admins")]
+
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> CreateOwner([FromQuery] int countryId, [FromBody] OwnerDto ownerCreate)
@@ -104,6 +108,8 @@ namespace PokemonReviewApp.Controllers
 
         // PUT owner
         [HttpPut("{ownerId}")]
+        [Authorize(Roles = "Admins")]
+
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]
@@ -123,7 +129,7 @@ namespace PokemonReviewApp.Controllers
                 await _ownerRepository.UpdateOwner(ownerUpdate);
                 return Ok(ownerUpdate);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
@@ -131,6 +137,8 @@ namespace PokemonReviewApp.Controllers
 
         // DELETE owner
         [HttpDelete("{ownerId}")]
+        [Authorize(Roles = "Admins")]
+
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]
@@ -139,14 +147,14 @@ namespace PokemonReviewApp.Controllers
             if (!_countryRepository.CountryExist(ownerId))
                 return BadRequest(ModelState);
 
-            var ownerToDelete =await _ownerRepository.GetOwner(ownerId);
+            var ownerToDelete = await _ownerRepository.GetOwner(ownerId);
 
             try
             {
                 await _ownerRepository.DeleteOwner(ownerToDelete);
                 return Ok(ownerToDelete);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }

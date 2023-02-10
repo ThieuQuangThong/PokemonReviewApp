@@ -7,7 +7,6 @@ using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CategoryController : Controller
@@ -24,6 +23,7 @@ namespace PokemonReviewApp.Controllers
 
         // GET Categories
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Category>))]
         public async Task<IActionResult> GetCategories()
         {
@@ -37,6 +37,8 @@ namespace PokemonReviewApp.Controllers
 
         // GET Category/id
         [HttpGet("{categoryId}")]
+        [Authorize]
+
         [ProducesResponseType(200, Type = typeof(Category))]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetCategory(int categoryId)
@@ -53,6 +55,8 @@ namespace PokemonReviewApp.Controllers
 
         // GET Category/pokemon/categoryd
         [HttpGet("pokemon/{categoryId}")]
+        [Authorize]
+
         [ProducesResponseType(200, Type = typeof(IEnumerable<Pokemon>))]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetPokemonByCategory(int categoryId)
@@ -67,6 +71,7 @@ namespace PokemonReviewApp.Controllers
 
         // POST Category
         [HttpPost]
+        [Authorize(Roles = "Admins")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> CreateCategory([FromBody] CategoryDto categoryCreate)
@@ -100,6 +105,7 @@ namespace PokemonReviewApp.Controllers
 
         // PUT category
         [HttpPut("{categoryId}")]
+        [Authorize(Roles = "Admins")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]
@@ -134,6 +140,7 @@ namespace PokemonReviewApp.Controllers
 
         // DELETE categoryId
         [HttpDelete("{categoryId}")]
+        [Authorize(Roles = "Admins")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]
