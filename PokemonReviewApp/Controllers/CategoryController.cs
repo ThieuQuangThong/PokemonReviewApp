@@ -7,7 +7,6 @@ using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CategoryController : Controller
@@ -23,7 +22,11 @@ namespace PokemonReviewApp.Controllers
 
 
         // GET Categories
+        /// <summary>
+        /// Get all categories.
+        /// </summary>
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Category>))]
         public async Task<IActionResult> GetCategories()
         {
@@ -36,7 +39,12 @@ namespace PokemonReviewApp.Controllers
         }
 
         // GET Category/id
+        /// <summary>
+        /// Get category by Id.
+        /// </summary>
         [HttpGet("{categoryId}")]
+        [Authorize]
+
         [ProducesResponseType(200, Type = typeof(Category))]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetCategory(int categoryId)
@@ -50,9 +58,13 @@ namespace PokemonReviewApp.Controllers
             }
             return Ok(category);
         }
-
+        /// <summary>
+        /// Get Pokemon of Category.
+        /// </summary>
         // GET Category/pokemon/categoryd
         [HttpGet("pokemon/{categoryId}")]
+        [Authorize]
+
         [ProducesResponseType(200, Type = typeof(IEnumerable<Pokemon>))]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetPokemonByCategory(int categoryId)
@@ -66,7 +78,11 @@ namespace PokemonReviewApp.Controllers
         }
 
         // POST Category
+        /// <summary>
+        /// Add category.
+        /// </summary>
         [HttpPost]
+        [Authorize(Roles = "Admins")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> CreateCategory([FromBody] CategoryDto categoryCreate)
@@ -99,7 +115,11 @@ namespace PokemonReviewApp.Controllers
         }
 
         // PUT category
+        /// <summary>
+        /// Update category information.
+        /// </summary>
         [HttpPut("{categoryId}")]
+        [Authorize(Roles = "Admins")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]
@@ -133,7 +153,11 @@ namespace PokemonReviewApp.Controllers
         }
 
         // DELETE categoryId
+        /// <summary>
+        /// Delete category by Id.
+        /// </summary>
         [HttpDelete("{categoryId}")]
+        [Authorize(Roles = "Admins")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]

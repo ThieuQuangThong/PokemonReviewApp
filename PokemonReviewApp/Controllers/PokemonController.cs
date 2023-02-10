@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Data;
 using PokemonReviewApp.Dto;
@@ -8,6 +9,7 @@ using PokemonReviewApp.Repository;
 
 namespace PokemonReviewApp.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PokemonController : Controller
@@ -73,6 +75,8 @@ namespace PokemonReviewApp.Controllers
 
         // POST poke
         [HttpPost]
+        [Authorize(Roles = "Admins")]
+
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> CreatePokemon([FromQuery] int ownerId, [FromQuery] int catId, [FromBody] PokemonDto pokemonCreate)
@@ -98,7 +102,7 @@ namespace PokemonReviewApp.Controllers
                 await _pokemonRepository.CreatePokemon(ownerId, catId, pokemonCreate);
                 return Ok(pokemonCreate);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
@@ -106,6 +110,8 @@ namespace PokemonReviewApp.Controllers
 
         // PUT poke
         [HttpPut("{pokeId}")]
+        [Authorize(Roles = "Admins")]
+
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]
@@ -137,6 +143,8 @@ namespace PokemonReviewApp.Controllers
 
         // DELETE Pokemon
         [HttpDelete("{pokeId}")]
+        [Authorize(Roles = "Admins")]
+
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]

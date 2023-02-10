@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
@@ -20,7 +21,11 @@ namespace PokemonReviewApp.Controllers
         }
 
         // GET Countries
+        /// <summary>
+        /// Get all countries.
+        /// </summary>
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Country>))]
         public async Task<IActionResult> GetCountries()
         {
@@ -38,7 +43,11 @@ namespace PokemonReviewApp.Controllers
         }
 
         // GET Country/id
+        /// <summary>
+        /// Get country by Id.
+        /// </summary>
         [HttpGet("{countryId}")]
+        [Authorize]
         [ProducesResponseType(200, Type = typeof(Country))]
         public async Task<IActionResult> GetCountry(int countryId)
         {
@@ -55,7 +64,12 @@ namespace PokemonReviewApp.Controllers
         }
 
         // POST Country
+        /// <summary>
+        /// Add country.
+        /// </summary>
         [HttpPost]
+        [Authorize(Roles = "Admins")]
+
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> PostCountry([FromBody] CountryDto countryCreate)
@@ -86,7 +100,12 @@ namespace PokemonReviewApp.Controllers
         }
 
         // PUT Country
+        /// <summary>
+        /// Update country information.
+        /// </summary>
         [HttpPut("{countryId}")]
+        [Authorize(Roles = "Admins")]
+
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]
@@ -113,7 +132,12 @@ namespace PokemonReviewApp.Controllers
 
         }
         // DELETE countryId
+        /// <summary>
+        /// Delete country by Id.
+        /// </summary>
         [HttpDelete("{countryId}")]
+        [Authorize(Roles = "Admins")]
+
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]

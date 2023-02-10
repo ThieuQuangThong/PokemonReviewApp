@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
@@ -6,6 +7,7 @@ using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class OwnerController : Controller
@@ -22,6 +24,9 @@ namespace PokemonReviewApp.Controllers
         }
 
         // GET Owners
+        /// <summary>
+        /// Get all owners.
+        /// </summary>
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Owner>))]
         public async Task<IActionResult> GetOwners()
@@ -38,6 +43,9 @@ namespace PokemonReviewApp.Controllers
         }
 
         // GET Owners/id
+        /// <summary>
+        /// Get owner by Id.
+        /// </summary>
         [HttpGet("{ownerId}")]
         [ProducesResponseType(200, Type = typeof(OwnerDto))]
         public async Task<IActionResult> GetOwner(int ownerId)
@@ -55,6 +63,9 @@ namespace PokemonReviewApp.Controllers
         }
 
         // GET Owners/pokemon/ownerId
+        /// <summary>
+        /// Get pokemon of owner by ownerId.
+        /// </summary>
         [HttpGet("pokemon/{ownerId}")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Pokemon>))]
         public async Task<IActionResult> GetPokemonsByOwner(int ownerId)
@@ -71,7 +82,12 @@ namespace PokemonReviewApp.Controllers
         }
 
         // POST Owner
+        /// <summary>
+        /// Add Owner.
+        /// </summary>
         [HttpPost]
+        [Authorize(Roles = "Admins")]
+
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> CreateOwner([FromQuery] int countryId, [FromBody] OwnerDto ownerCreate)
@@ -103,7 +119,12 @@ namespace PokemonReviewApp.Controllers
         }
 
         // PUT owner
+        /// <summary>
+        /// Update Owner by ownerId.
+        /// </summary>
         [HttpPut("{ownerId}")]
+        [Authorize(Roles = "Admins")]
+
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]
@@ -123,7 +144,7 @@ namespace PokemonReviewApp.Controllers
                 await _ownerRepository.UpdateOwner(ownerUpdate);
                 return Ok(ownerUpdate);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
@@ -131,6 +152,8 @@ namespace PokemonReviewApp.Controllers
 
         // DELETE owner
         [HttpDelete("{ownerId}")]
+        [Authorize(Roles = "Admins")]
+
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]
@@ -139,14 +162,14 @@ namespace PokemonReviewApp.Controllers
             if (!_countryRepository.CountryExist(ownerId))
                 return BadRequest(ModelState);
 
-            var ownerToDelete =await _ownerRepository.GetOwner(ownerId);
+            var ownerToDelete = await _ownerRepository.GetOwner(ownerId);
 
             try
             {
                 await _ownerRepository.DeleteOwner(ownerToDelete);
                 return Ok(ownerToDelete);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }

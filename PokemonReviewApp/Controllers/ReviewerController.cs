@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
@@ -6,6 +7,7 @@ using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ReviewerController : Controller
@@ -73,6 +75,8 @@ namespace PokemonReviewApp.Controllers
 
         // POST Reviewer
         [HttpPost]
+        [Authorize(Roles = "Admins")]
+
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> CreateReviewer([FromBody] ReviewerDto reviewerCreate)
@@ -134,6 +138,8 @@ namespace PokemonReviewApp.Controllers
         }
 
         [HttpDelete("{reviewerId}")]
+        [Authorize(Roles = "Admins")]
+
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]
