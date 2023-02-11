@@ -7,7 +7,7 @@ To authenticate and authorize the access I use JWT to create a token when login.
 The last I improve this project with asynchronous to make it faster.
 I also use swagger to test API and note it.
 
-//This is the link youtube I follow to create this project: https://tinyurl.com/2q2qobzn
+This is the link to youtube I followed to create this project: https://tinyurl.com/2q2qobzn
 --------------------------------------------------------------------------------------------
 This is the pakages I used in this project:
 
