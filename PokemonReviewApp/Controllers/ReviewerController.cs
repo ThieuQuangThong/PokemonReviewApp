@@ -24,6 +24,9 @@ namespace PokemonReviewApp.Controllers
         }
 
         // GET Reviewers
+        /// <summary>
+        /// Get all reviews.
+        /// </summary>
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ReviewerDto>))]
         public async Task<IActionResult> GetReviewers()
@@ -45,6 +48,9 @@ namespace PokemonReviewApp.Controllers
         }
 
         // GET Reviewers/id
+        /// <summary>
+        /// Get review by reviewId.
+        /// </summary>
         [HttpGet("{reviewerId}")]
         [ProducesResponseType(200, Type = typeof(ReviewerDto))]
         public async Task<IActionResult> GetReviewer(int reviewerId)
@@ -59,6 +65,9 @@ namespace PokemonReviewApp.Controllers
         }
 
         // GET Reviewers/reviewerId/review
+        /// <summary>
+        /// Get all reviews of a reviewer.
+        /// </summary>
         [HttpGet("{reviewerId}/reviews")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Review>))]
         public IActionResult GetReviewsByAReviewer(int reviewerId)
@@ -74,6 +83,9 @@ namespace PokemonReviewApp.Controllers
         }
 
         // POST Reviewer
+        /// <summary>
+        /// Create a reviewer.
+        /// </summary>
         [HttpPost]
         [Authorize(Roles = "Admins")]
 
@@ -108,6 +120,9 @@ namespace PokemonReviewApp.Controllers
         }
 
         // PUT Reviewer
+        /// <summary>
+        /// Update a reviewer info by reviewerId.
+        /// </summary>
         [HttpPut("{reviewerId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
@@ -136,10 +151,12 @@ namespace PokemonReviewApp.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-
+        // DELETE a reviewer
+        /// <summary>
+        /// Delete a reviewer by reviewerId.
+        /// </summary>
         [HttpDelete("{reviewerId}")]
         [Authorize(Roles = "Admins")]
-
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(200)]

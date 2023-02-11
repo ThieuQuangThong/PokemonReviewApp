@@ -151,6 +151,9 @@ namespace PokemonReviewApp.Controllers
         }
 
         // DELETE owner
+        /// <summary>
+        /// Delete owner by ownerId.
+        /// </summary>
         [HttpDelete("{ownerId}")]
         [Authorize(Roles = "Admins")]
 

@@ -26,6 +26,9 @@ namespace PokemonReviewApp.Controllers
         }
 
         // GET Reviews
+        /// <summary>
+        /// Get all Reviews.
+        /// </summary>
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Review>))]
         public async Task<IActionResult> GetReviews()
@@ -41,6 +44,9 @@ namespace PokemonReviewApp.Controllers
         }
 
         // GET Reviews/id
+        /// <summary>
+        /// Get review by reviewId.
+        /// </summary>
         [HttpGet("{reviewId}")]
         [ProducesResponseType(200, Type = typeof(Review))]
         [ProducesResponseType(400)]
@@ -55,6 +61,9 @@ namespace PokemonReviewApp.Controllers
         }
 
         // GET Review/pokemon/pokeId
+        /// <summary>
+        /// Get all reviews of a Pokemon by pokemonId.
+        /// </summary>
         [HttpGet("pokemon/{pokeId}")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Review>))]
         [ProducesResponseType(400)]
@@ -66,6 +75,9 @@ namespace PokemonReviewApp.Controllers
         }
 
         // POST Review
+        /// <summary>
+        /// Add review.
+        /// </summary>
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -93,6 +105,9 @@ namespace PokemonReviewApp.Controllers
         }
 
         // PUT review
+        /// <summary>
+        /// Update a review by reviewId.
+        /// </summary>
         [HttpPut("{reviewId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
@@ -123,6 +138,9 @@ namespace PokemonReviewApp.Controllers
         }
 
         // DELETE review
+        /// <summary>
+        /// Delete a review by reviewId.
+        /// </summary>
         [HttpDelete("{reviewId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]

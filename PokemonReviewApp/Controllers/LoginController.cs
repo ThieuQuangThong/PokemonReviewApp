@@ -24,7 +24,7 @@ namespace PokemonReviewApp.Controllers
             _authenticaRepository = authenticaRepository;
         }
         /// <summary>
-        /// Login.
+        /// Please enter User Name and Password to login.
         /// </summary>
         /// <returns>Login</returns>
         [AllowAnonymous]
