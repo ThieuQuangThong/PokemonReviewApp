@@ -9,17 +9,29 @@ I also use swagger to test API and note it.
 //This is the link youtube I follow to create this project: https://tinyurl.com/2q2qobzn
 --------------------------------------------------------------------------------------------
 This is the pakages I used in this project:
+
 -Microsoft.EntityFrameworkCore.
+
 -Microsoft.EntityFrameworkCore.Design.
+
 -Microsoft.EntityFrameworkCore.SqlServer.
+
 -Microsoft.EntityFrameworkCore.Tools.
+
 -AutoMapper.
+
 -AutoMapper.Extensions.Microsoft.DependencyInjection.
+
 -Microsoft.Owin.Security.Jwt.
+
 -Microsoft.AspNetCore.Authentication.JwtBearer.
+
 -Swashbuckle.AspNetCore.
+
 -Swashbuckle.AspNetCore.Swagger.
+
 -Swashbuckle.AspNetCore.SwaggerGen.
+
 -Swashbuckle.AspNetCore.SwaggerUI.
 
 Thank you and have a nice day !!!
